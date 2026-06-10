@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Sign in or create an account to access AuraCareer — AI-Powered Indian Career Guidance System.">
-  <title>Login — AuraCareer</title>
+  <meta name="description" content="Sign in or create an account to access Career Guidance — AI-Powered Career Guidance System.">
+  <title>Login — Career Guidance</title>
 
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -19,12 +19,8 @@
 </head>
 <body class="login-body">
 
-  <!-- Background Glow -->
-  <div class="login-bg-glow">
-    <div class="glow-orb g1"></div>
-    <div class="glow-orb g2"></div>
-    <div class="glow-orb g3"></div>
-  </div>
+  <!-- Dither Wave Background -->
+  <div id="dither-bg" style="position:fixed;inset:0;z-index:0;pointer-events:none;"></div>
 
   <!-- Login Container -->
   <div class="login-container">
@@ -42,7 +38,7 @@
       <div class="login-header">
         <div class="login-logo-wrap">
           <i class="fas fa-brain-circuit login-logo-icon"></i>
-          <div class="login-logo-name">AURA<span>CAREER</span></div>
+          <div class="login-logo-name">CAREER<span>GUIDANCE</span></div>
         </div>
         <h2 id="auth-title">Welcome Back</h2>
         <p id="auth-subtitle">Sign in to continue your career journey</p>
@@ -138,9 +134,32 @@
 
     <!-- Footer -->
     <div class="login-footer">
-      <p>By continuing, you agree to AuraCareer's <a href="#">Terms</a> and <a href="#">Privacy Policy</a></p>
+      <p>By continuing, you agree to Career Guidance's <a href="#">Terms</a> and <a href="#">Privacy Policy</a></p>
     </div>
   </div>
+
+  <!-- Dither Background Script -->
+  <script src="js/dither.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const ditherContainer = document.getElementById('dither-bg');
+      if (ditherContainer && typeof createDither === 'function') {
+        // Allow mouse interaction on the background
+        ditherContainer.style.pointerEvents = 'auto';
+        createDither(ditherContainer, {
+          waveColor: [0.5, 0.5, 0.5],
+          disableAnimation: false,
+          enableMouseInteraction: true,
+          mouseRadius: 0.3,
+          colorNum: 4,
+          waveAmplitude: 0.3,
+          waveFrequency: 3,
+          waveSpeed: 0.05,
+          pixelSize: 2
+        });
+      }
+    });
+  </script>
 
   <!-- Login Script -->
   <script src="js/login.js"></script>
