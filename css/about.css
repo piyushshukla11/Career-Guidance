@@ -1,0 +1,311 @@
+/* ==========================================================================
+   AuraCareer — About Page Styles
+   BLACK TRANSPARENT MIRROR THEME — About-specific layouts & cards
+   ========================================================================== */
+
+/* Active nav link indicator */
+.nav-link-ghost.active {
+  color: var(--mirror-text);
+  border-color: var(--mirror-border-hover);
+  background: var(--mirror-surface);
+}
+
+/* ==========================================================================
+   About Hero
+   ========================================================================== */
+.about-hero {
+  position: relative;
+  z-index: 1;
+  min-height: 60vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 120px 24px 60px;
+  text-align: center;
+}
+
+.about-hero-content {
+  max-width: 700px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  animation: fadeInUp 0.8s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.about-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 18px;
+  border-radius: 100px;
+  background: var(--mirror-glass);
+  border: 1px solid var(--mirror-border);
+  color: var(--mirror-accent);
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  backdrop-filter: blur(20px);
+}
+
+.about-title {
+  font-size: clamp(2.2rem, 5vw, 3.4rem);
+  line-height: 1.1;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: var(--mirror-text);
+}
+
+.about-lead {
+  font-size: 1.15rem;
+  color: var(--mirror-text2);
+  line-height: 1.7;
+  max-width: 550px;
+}
+
+/* ==========================================================================
+   Sections
+   ========================================================================== */
+.about-section {
+  position: relative;
+  z-index: 1;
+  padding: 60px 24px;
+}
+
+.about-container {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.section-header {
+  text-align: center;
+  margin-bottom: 48px;
+}
+
+.section-header h2 {
+  font-size: clamp(1.5rem, 3vw, 2.2rem);
+  margin-bottom: 10px;
+  color: var(--mirror-text);
+}
+
+.section-header p {
+  color: var(--mirror-text2);
+  font-size: 1rem;
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+/* ==========================================================================
+   Grids
+   ========================================================================== */
+.about-grid {
+  display: grid;
+  gap: 20px;
+}
+
+.about-grid-2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.about-grid-3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+/* ==========================================================================
+   Glass Cards
+   ========================================================================== */
+.glass-card {
+  padding: 36px 28px;
+  border-radius: var(--mirror-radius);
+  background: var(--mirror-surface);
+  backdrop-filter: blur(24px) saturate(1.1);
+  -webkit-backdrop-filter: blur(24px) saturate(1.1);
+  border: 1px solid var(--mirror-border);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Mirror reflection sweep */
+.glass-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.04),
+    transparent
+  );
+  transition: left 0.7s ease;
+  pointer-events: none;
+}
+
+.glass-card:hover::before {
+  left: 160%;
+}
+
+.glass-card:hover {
+  border-color: var(--mirror-border-hover);
+  background: var(--mirror-surface-hover);
+  transform: translateY(-4px);
+  box-shadow:
+    0 12px 40px rgba(255, 255, 255, 0.03),
+    0 0 1px rgba(255, 255, 255, 0.1);
+}
+
+/* ==========================================================================
+   Mission Cards
+   ========================================================================== */
+.card-icon {
+  font-size: 1.8rem;
+  color: var(--mirror-accent);
+  opacity: 0.7;
+  margin-bottom: 16px;
+}
+
+.mission-card h2 {
+  font-size: 1.3rem;
+  margin-bottom: 12px;
+  color: var(--mirror-text);
+}
+
+.mission-card p {
+  font-size: 0.92rem;
+  color: var(--mirror-text2);
+  line-height: 1.7;
+}
+
+/* ==========================================================================
+   Step Cards (What We Do)
+   ========================================================================== */
+.step-number {
+  font-family: 'Outfit', sans-serif;
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.06);
+  margin-bottom: 12px;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+.step-card h3 {
+  font-size: 1.15rem;
+  color: var(--mirror-text);
+  margin-bottom: 8px;
+}
+
+.step-card p {
+  font-size: 0.88rem;
+  color: var(--mirror-text2);
+  line-height: 1.6;
+}
+
+/* ==========================================================================
+   Tech Stack Pills
+   ========================================================================== */
+.tech-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+}
+
+.tech-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 22px;
+  border-radius: 100px;
+  background: var(--mirror-surface);
+  border: 1px solid var(--mirror-border);
+  color: var(--mirror-text2);
+  font-size: 0.88rem;
+  font-weight: 500;
+  font-family: 'Space Grotesk', sans-serif;
+  backdrop-filter: blur(16px);
+  transition: all 0.3s ease;
+  cursor: default;
+}
+
+.tech-pill i {
+  color: var(--mirror-accent);
+  opacity: 0.7;
+  font-size: 1rem;
+}
+
+.tech-pill:hover {
+  border-color: var(--mirror-border-hover);
+  background: var(--mirror-surface-hover);
+  color: var(--mirror-text);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(255, 255, 255, 0.03);
+}
+
+/* ==========================================================================
+   CTA Card
+   ========================================================================== */
+.about-cta-section {
+  padding: 40px 24px 80px;
+}
+
+.cta-card {
+  text-align: center;
+  padding: 56px 40px;
+}
+
+.cta-card h2 {
+  font-size: clamp(1.4rem, 3vw, 2rem);
+  margin-bottom: 12px;
+  color: var(--mirror-text);
+}
+
+.cta-card p {
+  color: var(--mirror-text2);
+  font-size: 1rem;
+  margin-bottom: 28px;
+  max-width: 420px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.cta-card .cta-primary {
+  display: inline-flex;
+}
+
+/* ==========================================================================
+   Responsive
+   ========================================================================== */
+@media (max-width: 768px) {
+  .about-grid-2 {
+    grid-template-columns: 1fr;
+  }
+
+  .about-grid-3 {
+    grid-template-columns: 1fr;
+  }
+
+  .about-hero {
+    min-height: 50vh;
+    padding: 100px 24px 40px;
+  }
+
+  .cta-card {
+    padding: 40px 24px;
+  }
+}

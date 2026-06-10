@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
       hoverIntensity: 0.2,
       rotateOnHover: true,
       forceHoverState: false,
-      backgroundColor: '#060a14'
+      backgroundColor: '#000000'
     });
   }
 
@@ -41,12 +41,12 @@ document.addEventListener('DOMContentLoaded', () => {
       p.style.height = p.style.width;
       p.style.opacity = (0.15 + Math.random() * 0.35);
 
-      // Randomize color between accent shades
+      // Randomize color between silver/white shades
       const colors = [
-        'rgba(79, 142, 247, 0.5)',
-        'rgba(124, 58, 237, 0.4)',
-        'rgba(219, 39, 119, 0.3)',
-        'rgba(167, 139, 250, 0.4)'
+        'rgba(255, 255, 255, 0.3)',
+        'rgba(192, 192, 192, 0.25)',
+        'rgba(220, 220, 220, 0.2)',
+        'rgba(255, 255, 255, 0.15)'
       ];
       p.style.background = colors[Math.floor(Math.random() * colors.length)];
       particleField.appendChild(p);
