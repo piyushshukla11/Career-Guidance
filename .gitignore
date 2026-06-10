@@ -8,3 +8,8 @@ Thumbs.db
 
 # Node (if added later)
 node_modules/
+
+# Environment / API keys
+gemini-env/.env
+*.env
+!*.env.example

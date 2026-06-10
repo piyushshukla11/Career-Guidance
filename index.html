@@ -1,663 +1,152 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="AI-Based Indian Career Guidance and Job Recommendation System. Enter skills, parse resume, view flowchart connections, and find top Indian hiring companies.">
-  <title>AuraCareer - AI Indian Career Guidance System</title>
-  
-  <!-- Google Fonts: Space Grotesk, Outfit, Inter -->
+  <meta name="description" content="AuraCareer — AI-Powered Indian Career Guidance System. Discover your ideal career path with intelligent skill matching, salary predictions, and personalized roadmaps.">
+  <title>AuraCareer — AI Career Guidance for India</title>
+
+  <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  
+
   <!-- Font Awesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  
-  <!-- Custom Stylesheet -->
-  <link rel="stylesheet" href="css/style.css">
-</head>
-<body>
 
-  <!-- Background Glowing Blobs for Premium Glassmorphism Look -->
-  <div class="blob-bg">
-    <div class="blob blob-purple"></div>
-    <div class="blob blob-blue"></div>
-    <div class="blob blob-pink"></div>
+  <!-- Landing Page Styles -->
+  <link rel="stylesheet" href="css/landing.css">
+</head>
+<body class="landing-body">
+
+  <!-- Background Ambient Glow -->
+  <div class="landing-bg-glow">
+    <div class="glow-orb glow-1"></div>
+    <div class="glow-orb glow-2"></div>
+    <div class="glow-orb glow-3"></div>
   </div>
 
-  <!-- Main Navbar Header -->
-  <nav class="main-nav glass">
-    <div class="logo" onclick="goTo(0)">
-      <i class="fas fa-brain-circuit brain-logo animate-pulse"></i>
-      <span>AURA<span>CAREER</span></span>
-    </div>
+  <!-- Floating Particles -->
+  <div class="particle-field"></div>
 
-    <!-- Step dot progress tracker -->
-    <div class="step-progress-wrapper" id="nav-step-progress" style="display: none;">
-      <div class="step-dots">
-        <div class="step-dot" id="d1" onclick="goTo(1)" title="Entry Method"></div>
-        <div class="step-dot" id="d2" onclick="goTo(2)" title="Interests"></div>
-        <div class="step-dot" id="d3" onclick="goTo(3)" title="Skills selection"></div>
-        <div class="step-dot" id="d4" onclick="goTo(4)" title="Profile Info"></div>
-        <div class="step-dot" id="d5" onclick="goTo(5)" title="Assessment"></div>
-        <div class="step-dot" id="d6" onclick="goTo(6)" title="AI Flow"></div>
-        <div class="step-dot" id="d7" onclick="goTo(7)" title="Matches"></div>
-      </div>
-      <span class="step-label" id="stepLabel">Step 1 of 7</span>
+  <!-- Navbar -->
+  <nav class="landing-nav" id="landing-nav">
+    <div class="landing-logo">
+      <i class="fas fa-brain-circuit landing-logo-icon"></i>
+      <div class="landing-logo-text">AURA<span>CAREER</span></div>
     </div>
-
-    <div class="nav-right">
-      <!-- Dark/Light Theme Toggle -->
-      <button id="theme-toggle" class="theme-toggle-btn" onclick="toggleTheme()" title="Toggle Theme">
-        <i class="fas fa-sun"></i>
-      </button>
+    <div class="landing-nav-links">
+      <a href="#features" class="nav-link-btn nav-link-ghost">Features</a>
+      <a href="login.html" class="nav-link-btn nav-link-ghost">Log In</a>
+      <a href="login.html" class="nav-link-btn nav-link-primary">Get Started</a>
     </div>
   </nav>
 
-  <!-- Main App Shell -->
-  <div id="app" class="app-wizard-container">
+  <!-- Hero Section -->
+  <section class="landing-hero" id="hero">
+    <div class="hero-layout">
 
-    <!-- PAGE 0: LANDING PAGE -->
-    <section class="page active" id="page0">
-      <div class="hero-section">
-        <div class="hero-badge animate-pulse">✦ AI-Powered Indian Career Recommender</div>
-        <h1>Turn Your <span>Skills</span> Into Indian Market Direction</h1>
-        <p>AuraCareer maps your tech stack directly into 12 industrial domains in India. Get match percentages, localized salary forecasts in Lakhs Per Annum (LPA), and a custom learning roadmap.</p>
-        
-        <div class="hero-actions">
-          <button class="btn btn-primary btn-lg" onclick="goTo(1)">
-            <span>Get Started & Analyze</span>
+      <!-- Left: Text Content -->
+      <div class="hero-content">
+        <div class="hero-badge">
+          <i class="fas fa-sparkles"></i>
+          AI-Powered Career Intelligence
+        </div>
+
+        <h1 class="hero-title">
+          Turn Your <span class="gradient-text">Skills</span> Into<br>
+          Indian Market <span class="gradient-text">Direction</span>
+        </h1>
+
+        <p class="hero-subtitle">
+          AuraCareer maps your tech stack directly into 12 industrial domains across India.
+          Get match percentages, localized LPA salary forecasts, and a custom learning roadmap — powered by AI.
+        </p>
+
+        <div class="hero-cta-group">
+          <a href="login.html" class="cta-primary" id="cta-get-started">
+            <span>Get Started Free</span>
             <i class="fas fa-arrow-right"></i>
-          </button>
-          
-          <div class="preset-links-row" style="margin-top: 24px; display: flex; justify-content: center; gap: 12px; flex-wrap: wrap;">
-            <span style="font-size: 0.85rem; color: var(--text2); display: flex; align-items: center; width: 100%; justify-content: center; margin-bottom: 8px; font-weight: 500;">Or load a demo preset to verify matches instantly:</span>
-            <button class="btn btn-ghost btn-sm" onclick="demoPreset('python-css-designing')">
-              <i class="fab fa-python" style="color: var(--warning);"></i> Python + CSS + Designing
-            </button>
-            <button class="btn btn-ghost btn-sm" onclick="demoPreset('ai-data')">
-              <i class="fas fa-database" style="color: var(--accent);"></i> Python + SQL + Data Sci
-            </button>
-            <button class="btn btn-ghost btn-sm" onclick="demoPreset('automation')">
-              <i class="fas fa-gears" style="color: var(--success);"></i> PLC + SCADA + Sensors
-            </button>
+          </a>
+          <a href="#features" class="cta-secondary">
+            <i class="fas fa-play-circle"></i>
+            <span>How it Works</span>
+          </a>
+        </div>
+
+        <div class="hero-stats">
+          <div class="stat-item">
+            <div class="stat-val" data-value="12+">0</div>
+            <div class="stat-label">Career Domains</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-val" data-value="30+">0</div>
+            <div class="stat-label">Job Roles</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-val" data-value="50+">0</div>
+            <div class="stat-label">Skill Tags</div>
           </div>
         </div>
       </div>
 
-      <div class="section features-grid">
-        <div class="card glass">
-          <div class="card-icon"><i class="fas fa-brain-circuit"></i></div>
+      <!-- Right: Orb Visual -->
+      <div class="hero-orb-container">
+        <div class="hero-orb-inner" id="orb-mount"></div>
+      </div>
+
+    </div>
+
+    <!-- Scroll indicator -->
+    <div class="scroll-indicator">
+      <div class="mouse"></div>
+      <span>Scroll</span>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section class="landing-features" id="features">
+    <div class="features-wrapper">
+      <div class="features-section-title">
+        <h2>Intelligent Career Matching</h2>
+        <p>Everything you need to navigate the Indian job market with confidence.</p>
+      </div>
+
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon"><i class="fas fa-brain-circuit"></i></div>
           <h3>Tag Flow Matching</h3>
-          <p>Links your programming and hardware skills directly to modern job markets.</p>
+          <p>Links your programming and hardware skills directly to modern Indian job markets using AI graph analysis.</p>
         </div>
-        <div class="card glass">
-          <div class="card-icon"><i class="fas fa-money-bill-trend-up"></i></div>
+
+        <div class="feature-card">
+          <div class="feature-icon"><i class="fas fa-money-bill-trend-up"></i></div>
           <h3>Predicted LPA Salary</h3>
-          <p>Local Indian salaries scaled by experience level, cities, and qualification.</p>
+          <p>Local Indian salaries scaled by experience level, cities, and qualification — accurate to your profile.</p>
         </div>
-        <div class="card glass">
-          <div class="card-icon"><i class="fas fa-file-invoice"></i></div>
+
+        <div class="feature-card">
+          <div class="feature-icon"><i class="fas fa-file-invoice"></i></div>
           <h3>AI Resume Parser</h3>
-          <p>Instantly extract key capabilities from your PDF/DOCX resume file.</p>
-        </div>
-        <div class="card glass">
-          <div class="card-icon"><i class="fas fa-sliders"></i></div>
-          <h3>Feedback Optimizer</h3>
-          <p>Provides a training loop console that retrains matching weights based on reviews.</p>
-        </div>
-      </div>
-    </section>
-
-    <!-- PAGE 1: CHOOSE METHOD -->
-    <section class="page" id="page1">
-      <div class="section wizard-card-frame">
-        <div class="progress-bar"><div class="progress-fill" id="pb-1" style="width: 14%;"></div></div>
-        
-        <h2 class="section-title">How would you like to build your profile?</h2>
-        <p class="section-sub">Choose how you want to input your technical skills into the recommender.</p>
-        
-        <div class="method-grid">
-          <div class="method-card glass" id="mManual" onclick="selectMethod('manual')">
-            <div class="m-icon"><i class="fas fa-keyboard"></i></div>
-            <div class="m-title">Manual Tag Entry</div>
-            <div class="m-sub">Select your interests and tick your active skills manually.</div>
-          </div>
-          
-          <div class="method-card glass" id="mResume" onclick="selectMethod('resume')">
-            <div class="m-icon"><i class="fas fa-cloud-arrow-up"></i></div>
-            <div class="m-title">Upload Resume File</div>
-            <div class="m-sub">Upload your PDF or DOCX file to auto-extract active skill tags.</div>
-          </div>
+          <p>Instantly extract key capabilities from your PDF/DOCX resume and auto-match to career pathways.</p>
         </div>
 
-        <!-- Resume File Upload Box -->
-        <div id="resumeSection" style="display: none;" class="animate-fadeIn">
-          <div class="upload-zone glass" id="uploadZone" onclick="document.getElementById('resumeFile').click()" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)">
-            <i class="fas fa-folder-open u-icon"></i>
-            <h4>Drag & Drop your resume here or click to browse</h4>
-            <p>Supports PDF, DOCX, DOC · Max 5MB</p>
-          </div>
-          <input type="file" id="resumeFile" accept=".pdf,.doc,.docx" style="display: none;" onchange="handleFileSelect(event)"/>
-          
-          <div id="filePreview" style="display: none;" class="file-preview-block">
-            <div class="file-preview glass">
-              <i class="fas fa-file-circle-check f-icon"></i>
-              <div class="file-info">
-                <div class="f-name" id="fileName">resume_alex.pdf</div>
-                <div class="f-size" id="fileSize">140 KB · PDF</div>
-              </div>
-              <button class="btn btn-ghost btn-sm" onclick="clearFile()">Remove</button>
-            </div>
-            
-            <!-- Parsing Terminal Simulator -->
-            <div class="parse-status-log glass" id="parseStatus">
-              <!-- Logs appended dynamically -->
-            </div>
-          </div>
+        <div class="feature-card">
+          <div class="feature-icon"><i class="fas fa-wand-magic-sparkles"></i></div>
+          <h3>Gemini AI Insights</h3>
+          <p>Powered by Google Gemini for intelligent career advice, resume analysis, and personalized recommendations.</p>
         </div>
-
-        <div class="nav-actions">
-          <button class="btn btn-ghost" onclick="goTo(0)"><i class="fas fa-chevron-left"></i> Back</button>
-          <button class="btn btn-primary" onclick="nextFromMethod()" id="methodNextBtn">Continue <i class="fas fa-chevron-right"></i></button>
-        </div>
-      </div>
-    </section>
-
-    <!-- PAGE 2: SELECT INTERESTS -->
-    <section class="page" id="page2">
-      <div class="section wizard-card-frame">
-        <div class="progress-bar"><div class="progress-fill" id="pb-2" style="width: 28%;"></div></div>
-        
-        <h2 class="section-title">What are your primary fields of interest?</h2>
-        <p class="section-sub">Select the industrial domains that align with your career goals.</p>
-        
-        <div class="interest-grid" id="interests-grid-wizard">
-          <!-- Injected dynamically -->
-        </div>
-
-        <div class="nav-actions">
-          <button class="btn btn-ghost" onclick="goTo(1)"><i class="fas fa-chevron-left"></i> Back</button>
-          <button class="btn btn-primary" onclick="nextFromInterests()">Continue <i class="fas fa-chevron-right"></i></button>
-        </div>
-      </div>
-    </section>
-
-    <!-- PAGE 3: CONFIRM & ADD SKILLS -->
-    <section class="page" id="page3">
-      <div class="section wizard-card-frame">
-        <div class="progress-bar"><div class="progress-fill" id="pb-3" style="width: 42%;"></div></div>
-        
-        <h2 class="section-title">Configure & Confirm Your Skills</h2>
-        <p class="section-sub">Auto-parsed skills are highlighted in green. Click other pills to add them.</p>
-
-        <div id="autoNotice" style="display: none;" class="auto-notice glass">
-          <i class="fas fa-circle-check success-text"></i> 
-          <span id="autoNoticeText">6 skills auto-detected from your resume.</span>
-        </div>
-
-        <div class="skills-config-box glass">
-          <div class="skills-categories-tabs" id="skills-cat-tabs-wizard">
-            <!-- Tabs dynamically rendered -->
-          </div>
-          
-          <div class="skills-pool" id="skills-pool-wizard">
-            <!-- Skills rendered dynamically -->
-          </div>
-        </div>
-
-        <div class="selected-summary-pills">
-          <div class="summary-count">Selected: <strong id="skillCount" class="purple-text">0</strong> skill tags</div>
-          <div class="skills-list" id="active-skills-list-wizard">
-            <!-- Active tags shown here -->
-          </div>
-        </div>
-
-        <div class="nav-actions">
-          <button class="btn btn-ghost" onclick="goTo(2)"><i class="fas fa-chevron-left"></i> Back</button>
-          <button class="btn btn-primary" onclick="nextFromSkills()">Continue <i class="fas fa-chevron-right"></i></button>
-        </div>
-      </div>
-    </section>
-
-    <!-- PAGE 4: PROFILE & EXPERIENCE DETAILS -->
-    <section class="page" id="page4">
-      <div class="section wizard-card-frame">
-        <div class="progress-bar"><div class="progress-fill" id="pb-4" style="width: 56%;"></div></div>
-        
-        <h2 class="section-title">Configure Your Indian Market Profile</h2>
-        <p class="section-sub">Provide your credentials to customize localized salary bands and demand metrics.</p>
-        
-        <div class="card glass form-container-card">
-          <div class="form-grid">
-            <div class="form-group">
-              <label for="userName">Full Name</label>
-              <div class="input-wrapper">
-                <i class="fas fa-user"></i>
-                <input type="text" id="userName" placeholder="e.g., Sandeep Kumar" value="Alex Carter">
-              </div>
-            </div>
-            
-            <div class="form-group">
-              <label for="userLocation">Location / City in India</label>
-              <div class="input-wrapper">
-                <i class="fas fa-location-dot"></i>
-                <input type="text" id="userLocation" placeholder="e.g., Bengaluru, Mumbai, Pune" value="Bengaluru, Karnataka">
-              </div>
-            </div>
-          </div>
-
-          <div class="form-grid">
-            <div class="form-group">
-              <label for="userDegree">Qualification Degree</label>
-              <div class="input-wrapper-select">
-                <i class="fas fa-graduation-cap"></i>
-                <select id="userDegree">
-                  <option value="">Select degree...</option>
-                  <option selected>B.E / B.Tech</option>
-                  <option>M.E / M.Tech</option>
-                  <option>MCA</option>
-                  <option>BCA</option>
-                  <option>B.Sc</option>
-                  <option>Diploma</option>
-                  <option>PhD</option>
-                </select>
-              </div>
-            </div>
-            
-            <div class="form-group">
-              <label for="userExp">Experience Tier</label>
-              <div class="input-wrapper-select">
-                <i class="fas fa-briefcase"></i>
-                <select id="userExp">
-                  <option value="">Select experience...</option>
-                  <option selected>Fresher (0 years)</option>
-                  <option>Junior (1-2 years)</option>
-                  <option>Mid-level (3-5 years)</option>
-                  <option>Senior (5+ years)</option>
-                </select>
-              </div>
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label for="userLevel">Self-Assessed Tech Proficiency</label>
-            <div class="input-wrapper-select">
-              <i class="fas fa-gauge-high"></i>
-              <select id="userLevel">
-                <option value="">Select level...</option>
-                <option>Beginner</option>
-                <option selected>Intermediate</option>
-                <option>Advanced</option>
-                <option>Expert</option>
-              </select>
-            </div>
-          </div>
-        </div>
-
-        <div class="nav-actions">
-          <button class="btn btn-ghost" onclick="goTo(3)"><i class="fas fa-chevron-left"></i> Back</button>
-          <button class="btn btn-primary" onclick="nextFromProfile()">Run Matching Engine <i class="fas fa-chevron-right"></i></button>
-        </div>
-      </div>
-    </section>
-
-    <!-- PAGE 5: SKILLS ASSESSMENT QUIZ (INTEGRATED) -->
-    <section class="page" id="page5">
-      <div class="section wizard-card-frame">
-        <div class="progress-bar"><div class="progress-fill" id="pb-5" style="width: 70%;"></div></div>
-        
-        <h2 class="section-title">Skills Validation Quiz (Optional)</h2>
-        <p class="section-sub">Passing skill-group questions validates your capabilities, boosting match scores.</p>
-
-        <div class="quiz-container-box glass">
-          <!-- Ready to Start -->
-          <div id="quiz-ready" class="quiz-state-block">
-            <i class="fas fa-clipboard-question quiz-large-icon quiz-ready-icon"></i>
-            <h2>Adaptive Validation Ready</h2>
-            <p>We compiled <strong id="quiz-question-count">0</strong> questions mapped to your active skill domains. Ready to validate?</p>
-            
-            <div class="quiz-completed-actions flex-row">
-              <button class="btn btn-ghost" onclick="skipQuiz()">Skip Quiz & View Connections</button>
-              <button class="btn btn-primary btn-lg" onclick="startQuiz()">
-                <span>Start Assessment</span>
-                <i class="fas fa-play"></i>
-              </button>
-            </div>
-          </div>
-
-          <!-- Active Quiz Question -->
-          <div id="quiz-active" class="quiz-state-block" style="display: none;">
-            <div class="quiz-progress-header">
-              <div class="progress-label">Question <span id="quiz-current-num">1</span> of <span id="quiz-total-num">5</span></div>
-              <div class="quiz-progress-bar-bg">
-                <div id="quiz-progress-bar" class="quiz-progress-bar-fill"></div>
-              </div>
-            </div>
-
-            <div class="quiz-question-section">
-              <span id="quiz-question-category" class="category-badge">Programming</span>
-              <h3 id="quiz-question-text">Which of the following describes a key syntax difference...?</h3>
-            </div>
-
-            <div class="quiz-options-list" id="quiz-options-list">
-              <!-- Injected by JS -->
-            </div>
-
-            <div class="quiz-navigation">
-              <button id="quiz-submit-answer" class="btn btn-primary" onclick="submitAnswer()" disabled>
-                <span>Submit & Next</span>
-                <i class="fas fa-arrow-right"></i>
-              </button>
-            </div>
-          </div>
-
-          <!-- Finished Score -->
-          <div id="quiz-finished" class="quiz-state-block" style="display: none;">
-            <i class="fas fa-award quiz-large-icon quiz-score-icon animate-pulse"></i>
-            <h2>Knowledge Successfully Logged!</h2>
-            <p>Your score has been registered. AI recommender confidence index adjusted.</p>
-            
-            <div class="score-display">
-              <div class="score-circle">
-                <span id="score-percentage">100%</span>
-                <span class="score-subtext">Accuracy</span>
-              </div>
-              <div class="score-stats">
-                <p>Correct Answers: <strong id="score-correct">4</strong></p>
-                <p>Total Questions: <strong id="score-total">4</strong></p>
-              </div>
-            </div>
-
-            <button class="btn btn-primary btn-lg" onclick="goTo(6)">
-              <span>Explore AI Nodes Connections</span>
-              <i class="fas fa-arrow-right"></i>
-            </button>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- PAGE 6: AI CONNECTIONS FLOWCHART -->
-    <section class="page" id="page6">
-      <div class="section wizard-card-frame max-w-xl">
-        <div class="progress-bar"><div class="progress-fill" id="pb-6" style="width: 84%;"></div></div>
-        
-        <h2 class="section-title">Mapping Skills -> Indian Job Market</h2>
-        <p class="section-sub">Hover or click nodes in the neural network to trace mapping pathways.</p>
-
-        <div class="engine-layout glass">
-          <div class="engine-header-bar">
-            <div class="engine-legend">
-              <span class="legend-item"><span class="dot active"></span> Active Route</span>
-              <span class="legend-item"><span class="dot inactive"></span> Inactive Route</span>
-            </div>
-            <div class="engine-status-readout">
-              <i class="fas fa-circle-nodes pulse-green"></i> System Status: <span id="engine-status-text">Processing</span>
-            </div>
-          </div>
-
-          <!-- Flowchart Container -->
-          <div class="flowchart-container" id="flowchart-container">
-            <svg id="flowchart-svg" class="flowchart-svg" xmlns="http://www.w3.org/2000/svg">
-              <!-- Paths drawn dynamically -->
-            </svg>
-
-            <div class="flowchart-nodes-grid">
-              <!-- Inputs -->
-              <div class="flowchart-column" id="col-inputs">
-                <h3>1. User Skills</h3>
-                <div class="nodes-list" id="input-nodes-list">
-                  <!-- Skills generated by app.js -->
-                </div>
-              </div>
-
-              <!-- Preprocessor Hubs -->
-              <div class="flowchart-column" id="col-engine">
-                <h3>2. Processing Pipelines</h3>
-                <div class="nodes-list">
-                  <div class="flowchart-node engine-node glass" id="node-preprocessor">
-                    <i class="fas fa-gears"></i>
-                    <span>Preprocessor Node</span>
-                    <div class="node-indicator"></div>
-                  </div>
-                  <div class="flowchart-node engine-node glass" id="node-recommender">
-                    <i class="fas fa-brain"></i>
-                    <span>AI Recommender</span>
-                    <div class="node-indicator"></div>
-                  </div>
-                  <div class="flowchart-node engine-node glass" id="node-market-data">
-                    <i class="fas fa-database"></i>
-                    <span>India Job DB</span>
-                    <div class="node-indicator"></div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Matches -->
-              <div class="flowchart-column" id="col-outputs">
-                <h3>3. Matched Positions</h3>
-                <div class="nodes-list" id="output-nodes-list">
-                  <!-- Matching jobs rendered by app.js -->
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Node Description Box -->
-          <div class="node-description-board glass" id="node-info-board">
-            <div class="board-placeholder">
-              <i class="fas fa-circle-info"></i>
-              <p>Hover or click on nodes in the chart to inspect matching details and skills connections.</p>
-            </div>
-            <div class="board-content" id="board-content" style="display: none;">
-              <h3 id="board-title">AI Solutions Architect</h3>
-              <div class="board-badge" id="board-badge">Match: 100%</div>
-              <p id="board-desc">Job overview text...</p>
-              <div class="board-details-grid" id="board-details-grid">
-                <!-- Info cards injected -->
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="nav-actions">
-          <button class="btn btn-ghost" onclick="goTo(4)"><i class="fas fa-chevron-left"></i> Back</button>
-          <button class="btn btn-primary btn-lg" onclick="goTo(7)">View Full Dashboard Results <i class="fas fa-chevron-right"></i></button>
-        </div>
-      </div>
-    </section>
-
-    <!-- PAGE 7: MATCH RESULTS DASHBOARD -->
-    <section class="page" id="page7">
-      <div class="section wizard-card-frame max-w-xl">
-        <div class="progress-bar"><div class="progress-fill" id="pb-7" style="width: 100%;"></div></div>
-        
-        <div class="results-header-row">
-          <div>
-            <h2 class="section-title" id="resultGreeting">Your Career Matches</h2>
-            <p class="section-sub">Predicted LPA ranges reflect local Indian cities hiring statistics.</p>
-          </div>
-          <button class="btn btn-ghost btn-sm" onclick="goTo(1)"><i class="fas fa-rotate-left"></i> Refine Search</button>
-        </div>
-
-        <!-- Banner for Resume Parser -->
-        <div id="resumeBanner" style="display: none;" class="auto-notice glass banner-notice">
-          <i class="fas fa-file-pdf"></i>
-          <span id="resumeBannerText">Skills analyzed from resume_alex.pdf.</span>
-        </div>
-
-        <!-- Statistics Summary Grid -->
-        <div class="summary-grid" id="summaryGrid">
-          <!-- Filled by app.js -->
-        </div>
-
-        <!-- AI Market Insights Box -->
-        <div class="insight-box glass" id="aiInsightBox">
-          <div class="ai-chip-header">
-            <span class="ai-chip"><i class="fas fa-wand-magic-sparkles"></i> AI India Market Analysis</span>
-          </div>
-          <p id="aiInsightText">Loading intelligence analytics...</p>
-        </div>
-
-        <!-- Results Tabs Switcher -->
-        <div class="results-tabs-wrapper" style="margin-bottom: 24px;">
-          <div class="results-tabs glass" style="display: inline-flex; gap: 4px; padding: 4px; border-radius: 100px; border: 1px solid var(--border); background: rgba(0, 0, 0, 0.2);">
-            <button id="tab-matches" class="btn btn-sm active" style="border-radius: 100px;" onclick="switchResultsTab('matches')">
-              <i class="fas fa-bullseye"></i> Matches (<span id="matches-tab-count">0</span>)
-            </button>
-            <button id="tab-all-careers" class="btn btn-sm btn-ghost" style="border-radius: 100px;" onclick="switchResultsTab('all')">
-              <i class="fas fa-compass"></i> Explore All Careers (<span id="all-careers-tab-count">0</span>)
-            </button>
-          </div>
-        </div>
-
-        <!-- Job Cards List -->
-        <div id="careerResults" class="career-results-vertical-list">
-          <!-- Cards Injected dynamically by JS -->
-        </div>
-
-        <!-- Smart Improvement Plan (Adaptive Learning Roadmap) -->
-        <div class="card glass roadmap-plan-card" id="learningSection">
-          <div class="plan-header-row">
-            <h3>🗺️ Custom Skill Improvement Roadmap</h3>
-            <span class="ai-chip"><i class="fas fa-network-wired"></i> Adaptive Guidance Plan</span>
-          </div>
-          <p class="subtitle">Complete these phases to address your skill gaps and align with successful hiring profiles in India:</p>
-          <div id="learningPath" class="roadmap-timeline-steps">
-            <!-- Roadmap items injected -->
-          </div>
-        </div>
-
-        <!-- Model Retraining Logs Box (Feedback console integration) -->
-        <div class="card glass console-feedback-card">
-          <div class="feedback-layout-grid">
-            <div class="feedback-form-side">
-              <h3>Optimize Recommender Weights</h3>
-              <p class="subtitle">Help refine thresholds for Indian recruitment patterns.</p>
-              
-              <form id="feedback-form" onsubmit="handleFeedbackSubmit(event)">
-                <div class="form-group-slider">
-                  <label>Matches Relevance Accuracy Score:</label>
-                  <div class="slider-wrapper">
-                    <input type="range" min="1" max="10" value="8" class="feedback-slider" id="fb-relevance-slider">
-                    <div class="slider-vals">
-                      <span>Low (1)</span>
-                      <span class="slider-bubble" id="fb-relevance-val">8</span>
-                      <span>High (10)</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="form-group-slider">
-                  <label>Learning Roadmap Utility:</label>
-                  <div class="slider-wrapper">
-                    <input type="range" min="1" max="10" value="9" class="feedback-slider" id="fb-utility-slider">
-                    <div class="slider-vals">
-                      <span>Low (1)</span>
-                      <span class="slider-bubble" id="fb-utility-val">9</span>
-                      <span>High (10)</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="form-group">
-                  <label for="fb-comments">Comments / Training Data Suggestions</label>
-                  <textarea id="fb-comments" rows="3" placeholder="Provide notes (e.g., Python + Designing + CSS recommendation values...)"></textarea>
-                </div>
-
-                <button type="submit" class="btn btn-primary btn-block">
-                  <i class="fas fa-microchip"></i>
-                  <span>Submit Feedback & Retrain Model</span>
-                </button>
-              </form>
-            </div>
-
-            <!-- Log Console -->
-            <div class="console-log-side">
-              <h3>Retraining Model Console</h3>
-              <div class="console-box" id="console-box">
-                <div class="console-line system-line">[SYSTEM] Indian Career Recommender Weights Engine ready.</div>
-              </div>
-
-              <div class="training-progress-box" id="training-progress-box" style="display: none;">
-                <div class="training-label">Retraining Neural Node Bias... <span id="train-pct">0%</span></div>
-                <div class="progress-bar-bg small">
-                  <div id="train-bar" class="progress-bar-fill progress-bar-blue" style="width: 0%;"></div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-      </div>
-    </section>
-
-  </div>
-
-  <!-- Job Details Modal Popups -->
-  <div id="job-modal" class="modal-overlay" style="display: none;">
-    <div class="modal-card glass">
-      <button class="modal-close" onclick="closeJobModal()">&times;</button>
-      
-      <div class="modal-header">
-        <h2 id="modal-job-name">AI Solutions Architect</h2>
-        <div class="modal-badges">
-          <span class="modal-badge badge-salary" id="modal-job-salary"><i class="fas fa-indian-rupee-sign"></i> ₹22.0 LPA</span>
-          <span class="modal-badge badge-match" id="modal-job-match"><i class="fas fa-check-circle"></i> 100% Match</span>
-        </div>
-      </div>
-
-      <div class="modal-body">
-        <div class="modal-section">
-          <h3>Role Overview</h3>
-          <p id="modal-job-desc">Detailed explanation...</p>
-        </div>
-
-        <!-- Key & Extra Skills Mapping -->
-        <div class="modal-section">
-          <h3>Required & Nice-to-Have Skills</h3>
-          <div class="result-skills" id="modal-job-skills">
-            <!-- Injected by JS -->
-          </div>
-        </div>
-
-        <!-- Indian Hiring Companies -->
-        <div class="modal-section">
-          <h3>Currently Hiring in India (Offices & Salaries)</h3>
-          <div class="companies-grid" id="modal-companies-list">
-            <!-- Injected by JS -->
-          </div>
-        </div>
-
-        <div class="modal-grid">
-          <!-- Roadmap -->
-          <div class="modal-section">
-            <h3>Adaptive Career Roadmap</h3>
-            <div class="roadmap-timeline" id="modal-roadmap">
-              <!-- Injected by JS -->
-            </div>
-          </div>
-
-          <!-- Courses -->
-          <div class="modal-section">
-            <h3>Recommended Courses & Materials</h3>
-            <ul class="resources-list" id="modal-resources">
-              <!-- Injected by JS -->
-            </ul>
-          </div>
-        </div>
-      </div>
-      
-      <div class="modal-footer">
-        <button class="btn btn-secondary" onclick="closeJobModal()">Close Details</button>
       </div>
     </div>
-  </div>
+  </section>
 
-  <!-- Load Database and Application Scripts -->
-  <script src="js/data.js"></script>
-  <script src="js/app.js"></script>
+  <!-- Footer -->
+  <footer class="landing-footer">
+    <p>© 2026 AuraCareer — AI Career Guidance System · Built with <a href="#">Intelligence</a></p>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/orb.js"></script>
+  <script src="js/landing.js"></script>
 </body>
 </html>
