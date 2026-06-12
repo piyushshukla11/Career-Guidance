@@ -10,6 +10,7 @@ const express = require('express');
 const session = require('express-session');
 const bcrypt = require('bcryptjs');
 const { MongoClient } = require('mongodb');
+const cors = require('cors');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -89,17 +90,27 @@ async function updateUser(email, updates) {
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// CORS middleware - must be before session and routes
+app.use(cors({
+  origin: true, // Allow all origins (will be restricted based on credentials)
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
 // Detect if running in production (Railway)
 const isProduction = process.env.NODE_ENV === 'production' || process.env.RAILWAY_ENVIRONMENT === 'production';
 
 app.use(session({
   secret: process.env.SESSION_SECRET || 'fallback-secret-change-me',
-  resave: false,
-  saveUninitialized: false,
+  resave: true,
+  saveUninitialized: true,
+  proxy: isProduction, // Trust proxy in production
   cookie: {
+    path: '/',
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     httpOnly: true,
-    sameSite: 'lax', // Use 'lax' for Railway compatibility
+    sameSite: isProduction ? 'none' : 'lax', // Use 'none' in production for cross-site
     secure: isProduction // Required for HTTPS in production
   }
 }));
@@ -109,6 +120,14 @@ app.use(express.static(__dirname, {
   extensions: ['html'],
   index: 'index.html'
 }));
+
+// Debug middleware - log all requests with session info
+app.use((req, res, next) => {
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`);
+  console.log(`  Session ID: ${req.sessionID}`);
+  console.log(`  Session User: ${req.session?.user?.email || 'none'}`);
+  next();
+});
 
 // ---------------------------------------------------------------------------
 // Auth Middleware Helper
@@ -167,10 +186,23 @@ app.post('/api/auth/signup', async (req, res) => {
     };
 
     console.log(`[AUTH] New user registered: ${normalizedEmail}`);
-    res.status(201).json({
-      success: true,
-      user: { name: newUser.name, email: newUser.email }
+    console.log(`[AUTH] Session ID: ${req.sessionID}`);
+    console.log(`[AUTH] Session user set: ${JSON.stringify(req.session.user)}`);
+    
+    // Force session save before responding
+    req.session.save((err) => {
+      if (err) {
+        console.error('[AUTH] Session save error:', err);
+        return res.status(500).json({ error: 'Session save failed' });
+      }
+      
+      console.log(`[AUTH] Session saved successfully`);
+      res.status(201).json({
+        success: true,
+        user: { name: newUser.name, email: newUser.email }
+      });
     });
+    return;
   } catch (err) {
     console.error('[AUTH] Signup error:', err.message);
     if (err.code === 11000) {
@@ -210,11 +242,24 @@ app.post('/api/auth/login', async (req, res) => {
       email: user.email
     };
 
-    console.log(`[AUTH] User logged in: ${normalizedEmail}`);
-    res.json({
-      success: true,
-      user: { name: user.name, email: user.email }
+    console.log(`[AUTH] Login successful for: ${normalizedEmail}`);
+    console.log(`[AUTH] Session ID: ${req.sessionID}`);
+    console.log(`[AUTH] Session user set: ${JSON.stringify(req.session.user)}`);
+    
+    // Force session save before responding
+    req.session.save((err) => {
+      if (err) {
+        console.error('[AUTH] Session save error:', err);
+        return res.status(500).json({ error: 'Session save failed' });
+      }
+      
+      console.log(`[AUTH] Session saved successfully`);
+      res.json({
+        success: true,
+        user: { name: user.name, email: user.email }
+      });
     });
+    return;
   } catch (err) {
     console.error('[AUTH] Login error:', err.message);
     res.status(500).json({ error: 'Internal server error during login.' });
@@ -237,12 +282,20 @@ app.post('/api/auth/logout', (req, res) => {
 
 // GET /api/auth/me — Check current session
 app.get('/api/auth/me', (req, res) => {
+  console.log(`[AUTH] /api/auth/me called`);
+  console.log(`[AUTH] Session ID: ${req.sessionID}`);
+  console.log(`[AUTH] Session exists: ${!!req.session}`);
+  console.log(`[AUTH] Session user: ${JSON.stringify(req.session?.user || 'none')}`);
+  
   if (req.session && req.session.user) {
+    console.log(`[AUTH] Returning loggedIn: true for ${req.session.user.email}`);
     return res.json({
       loggedIn: true,
       user: req.session.user
     });
   }
+  
+  console.log(`[AUTH] Returning loggedIn: false (no session/user)`);
   res.json({ loggedIn: false });
 });
 // GET /api/auth/google-client-id — Expose Google Client ID to frontend
@@ -313,10 +366,24 @@ app.post('/api/auth/google', async (req, res) => {
       email: user.email
     };
 
-    res.json({
-      success: true,
-      user: { name: user.name, email: user.email }
+    console.log(`[AUTH] Google OAuth session created`);
+    console.log(`[AUTH] Session ID: ${req.sessionID}`);
+    console.log(`[AUTH] Session user set: ${JSON.stringify(req.session.user)}`);
+    
+    // Force session save before responding
+    req.session.save((err) => {
+      if (err) {
+        console.error('[AUTH] Session save error:', err);
+        return res.status(500).json({ error: 'Session save failed' });
+      }
+      
+      console.log(`[AUTH] Session saved successfully`);
+      res.json({
+        success: true,
+        user: { name: user.name, email: user.email }
+      });
     });
+    return;
 
   } catch (err) {
     console.error('[AUTH] Google OAuth error:', err.message);
