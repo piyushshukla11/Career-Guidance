@@ -60,7 +60,8 @@ document.addEventListener('DOMContentLoaded', () => {
       const res = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
+        body: JSON.stringify({ email, password }),
+        credentials: 'include'
       });
 
       const data = await res.json();
@@ -121,7 +122,8 @@ document.addEventListener('DOMContentLoaded', () => {
       const res = await fetch('/api/auth/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, password })
+        body: JSON.stringify({ name, email, password }),
+        credentials: 'include'
       });
 
       const data = await res.json();
@@ -170,7 +172,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // --- Redirect if already logged in ---
-  fetch('/api/auth/me')
+  fetch('/api/auth/me', { credentials: 'include' })
     .then(res => res.json())
     .then(data => {
       if (data.loggedIn) {

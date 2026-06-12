@@ -162,4 +162,96 @@ Replaced the client-side-only localStorage auth and browser-exposed Gemini API w
   - Removed raw inline margins from the greeting span and logout button inside `app.html`.
   - Cache-busted `app.html` stylesheet to `v=12`.
 
+---
+
+## 2026-06-12 — MongoDB Atlas + Railway Deployment (24/7 Cloud Hosting) 🚧
+
+### Summary
+Migrated from local JSON file database to MongoDB Atlas (cloud-hosted) and deployed to Railway for 24/7 uptime.
+
+### Deployment Steps Completed:
+
+#### 1. Database Migration
+- Replaced JSON file DB (`data/users.json`) with MongoDB Atlas using official `mongodb` npm driver
+- Updated `server.js` to use MongoDB connection pooling with automatic reconnect
+- All auth routes (signup, login, Google OAuth) now use MongoDB instead of JSON files
+
+#### 2. Railway Deployment Setup
+- Created fork of repo to personal GitHub account (`piyushshukla11/Career-Guidance`)
+- Added `railway.json` configuration file for Railway deployment
+- Updated `package.json` with Node 18+ engine specification
+- Pushed code to GitHub and connected Railway to deploy from personal fork
+
+#### 3. Environment Variables Configured
+- `MONGODB_URI`: MongoDB Atlas connection string
+- `SESSION_SECRET`: Generated random secret for session encryption
+- `GEMINI_API_KEY`: Gemini API key for AI features
+- `GOOGLE_CLIENT_ID`: Google OAuth client ID
+- `NODE_ENV`: Set to `production`
+
+#### 4. MongoDB Atlas Configuration
+- Created free M0 cluster (512MB)
+- Configured database user: `piyushkumarshukla677_db_user`
+- Set IP access to "Allow Access from Anywhere" (0.0.0.0/0) for Railway connectivity
+- Database name: `career-guidance`
+
+#### 5. Session Configuration for Production
+- Updated session cookie settings for Railway compatibility
+- Changed `sameSite` from `'none'` to `'lax'` for better cookie handling
+- Set `secure: true` for HTTPS in production
+
+### Current Issue: Login Redirect Loop ⚠️
+
+**Problem**: After successful login, user is redirected back to login page instead of app.html.
+
+**Root Cause**: Session cookie not being properly set/persisted in Railway environment.
+
+**Troubleshooting Steps Taken**:
+1. ✅ Verified MONGODB_URI is correctly set (was placeholder, now actual connection string)
+2. ✅ Verified SESSION_SECRET is set (was placeholder, now generated value)
+3. ✅ Fixed MongoDB Atlas IP access (added 0.0.0.0/0)
+4. ✅ Updated session cookie configuration (sameSite: 'lax')
+5. ✅ Pushed fixes to GitHub and Railway redeployed
+
+**Status**: Still experiencing redirect loop after all fixes. Session appears to not persist between login request and subsequent page load.
+
+**Next Steps Needed**:
+- Debug session cookie behavior in Railway environment
+- Possibly add CORS configuration for cross-origin requests
+- Consider alternative session storage (Redis) for production
+- Add detailed logging to track session creation/validation
+
+**Live URL**: https://career-guidance-production-9c5c.up.railway.app
+
+---
+
+## 2026-06-13 — Session Cookie Persistence Fix ✅
+
+### Root Cause Identified & Fixed
+The login redirect loop was caused by **missing `credentials: 'include'` in fetch requests**. Browsers don't send session cookies with fetch requests unless this option is explicitly set.
+
+### Changes Made:
+**Updated all authentication-related fetch requests** to include `credentials: 'include'`:
+
+| File | Changes |
+|------|---------|
+| [js/login.js](js/login.js) | Added `credentials: 'include'` to login form, signup form, and session check fetches |
+| [app.html](app.html) | Added `credentials: 'include'` to auth/me and logout fetches |
+| [login.html](login.html) | Added `credentials: 'include'` to Google OAuth fetches |
+| [api/gemini.js](api/gemini.js) | Added `credentials: 'include'` to authenticated Gemini API calls |
+
+### Why This Works:
+- **Without `credentials: 'include'`**: The browser makes the fetch request BUT does not attach session cookies. The server receives the request without any session identifier.
+- **With `credentials: 'include'`**: The browser automatically attaches all cookies (including `connect.sid` session cookie) to the request, allowing the server to validate the session and maintain state.
+
+### Testing:
+- Login flow should now properly:
+  1. Send credentials to `/api/auth/login`
+  2. Server sets `connect.sid` cookie in response
+  3. Browser stores the cookie
+  4. Redirect to app.html with cookie in request
+  5. App checks `/api/auth/me` with the cookie
+  6. Server validates session and returns `loggedIn: true`
+
+**Live URL**: https://career-guidance-production-9c5c.up.railway.app
 

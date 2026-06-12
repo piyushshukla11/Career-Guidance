@@ -175,7 +175,7 @@
     // Fetch client ID from server and initialise GIS
     async function initGoogleAuth() {
       try {
-        const res = await fetch('/api/auth/google-client-id');
+        const res = await fetch('/api/auth/google-client-id', { credentials: 'include' });
         if (!res.ok) {
           console.warn('[Google] Client ID not configured on server.');
           return;
@@ -231,7 +231,8 @@
         const res = await fetch('/api/auth/google', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ credential: response.credential })
+          body: JSON.stringify({ credential: response.credential }),
+          credentials: 'include'
         });
 
         const data = await res.json();

@@ -43,7 +43,8 @@ const GeminiAPI = (() => {
       const response = await fetch('/api/gemini/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt, model: MODEL })
+        body: JSON.stringify({ prompt, model: MODEL }),
+        credentials: 'include'
       });
 
       if (response.ok) {

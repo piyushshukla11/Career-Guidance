@@ -671,7 +671,7 @@
     (async function() {
       // Check for active server-side session
       try {
-        const res = await fetch('/api/auth/me');
+        const res = await fetch('/api/auth/me', { credentials: 'include' });
         const data = await res.json();
 
         if (!data.loggedIn) {
@@ -721,7 +721,7 @@
     // Logout via backend API
     async function logoutUser() {
       try {
-        await fetch('/api/auth/logout', { method: 'POST' });
+        await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
       } catch (err) {
         console.error('[Auth] Logout error:', err);
       }
