@@ -15,11 +15,11 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
   <!-- Custom Stylesheet -->
-  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/style.css?v=12">
 </head>
 <body>
 
-  <!-- Background Glowing Blobs for Premium Glassmorphism Look -->
+  <!-- Background Glowing Blobs -->
   <div class="blob-bg">
     <div class="blob blob-purple"></div>
     <div class="blob blob-blue"></div>
@@ -57,8 +57,8 @@
         <i class="fas fa-sun"></i>
       </button>
       <!-- User greeting + Logout -->
-      <span id="nav-user-greeting" style="font-size: 0.82rem; color: var(--text2); margin-left: 8px;"></span>
-      <button class="theme-toggle-btn" onclick="logoutUser()" title="Logout" style="margin-left: 4px;">
+      <span id="nav-user-greeting" style="font-size: 0.82rem; color: var(--text2);"></span>
+      <button class="theme-toggle-btn" onclick="logoutUser()" title="Logout">
         <i class="fas fa-right-from-bracket"></i>
       </button>
     </div>
@@ -668,33 +668,33 @@
 
   <!-- Auth Check & Session Loader -->
   <script>
-    (function() {
-      // Check for active session
-      const session = JSON.parse(localStorage.getItem('auracareer_session') || 'null');
-      if (!session || !session.loggedIn) {
+    (async function() {
+      // Check for active server-side session
+      try {
+        const res = await fetch('/api/auth/me');
+        const data = await res.json();
+
+        if (!data.loggedIn) {
+          window.location.href = 'login.html';
+          return;
+        }
+
+        const user = data.user;
+        const firstName = user.name ? user.name.split(' ')[0] : 'User';
+
+        const welcomeEl = document.getElementById('welcome-name');
+        if (welcomeEl) welcomeEl.textContent = firstName;
+
+        const navGreeting = document.getElementById('nav-user-greeting');
+        if (navGreeting) navGreeting.textContent = 'Hi, ' + firstName;
+
+        // Pre-fill the profile name from session
+        const nameInput = document.getElementById('userName');
+        if (nameInput && user.name) nameInput.value = user.name;
+      } catch (err) {
+        console.error('[Auth] Session check failed:', err);
         window.location.href = 'login.html';
         return;
-      }
-
-      // Set greeting
-      const firstName = session.name ? session.name.split(' ')[0] : 'User';
-      const welcomeEl = document.getElementById('welcome-name');
-      if (welcomeEl) welcomeEl.textContent = firstName;
-
-      const navGreeting = document.getElementById('nav-user-greeting');
-      if (navGreeting) navGreeting.textContent = 'Hi, ' + firstName;
-
-      // Pre-fill the profile name from session
-      const nameInput = document.getElementById('userName');
-      if (nameInput && session.name) nameInput.value = session.name;
-
-      // Load Gemini key if saved
-      const geminiKey = localStorage.getItem('auracareer_gemini_key');
-      if (geminiKey) {
-        const keyInput = document.getElementById('gemini-key-input');
-        if (keyInput) keyInput.value = geminiKey;
-        const statusEl = document.getElementById('gemini-status');
-        if (statusEl) statusEl.textContent = '✓ API key loaded from saved settings.';
       }
     })();
 
@@ -704,24 +704,115 @@
       panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
     }
 
-    // Save Gemini API key
+    // Save Gemini API key (now just informational — key is on server)
     function saveGeminiKey() {
       const key = document.getElementById('gemini-key-input').value.trim();
       if (!key) {
         document.getElementById('gemini-status').textContent = '⚠ Please enter a valid API key.';
         return;
       }
+      // Store locally for reference, but real key is in server .env
       localStorage.setItem('auracareer_gemini_key', key);
       GeminiAPI.init(key);
       document.getElementById('gemini-status').textContent = '✓ Gemini API key saved & activated!';
       document.getElementById('gemini-status').style.color = 'var(--success)';
     }
 
-    // Logout
-    function logoutUser() {
-      localStorage.removeItem('auracareer_session');
+    // Logout via backend API
+    async function logoutUser() {
+      try {
+        await fetch('/api/auth/logout', { method: 'POST' });
+      } catch (err) {
+        console.error('[Auth] Logout error:', err);
+      }
       window.location.href = 'login.html';
     }
+
+    // Click-based non-white text color cycling
+    (function() {
+      const colors = [
+        '#ff5e36', // Vibrant Reddish Orange
+        '#ff7a59', // Coral
+        '#f97316', // Orange
+        '#fdba74', // Soft Peach/Orange
+        '#f59e0b', // Amber/Yellow
+        '#e2e8f0', // Cool Slate Gray
+        '#ffffff', // Pure White
+        '#fca5a5', // Light Rose/Red
+        '#fecdd3', // Soft Pinkish Peach
+        '#d6d3d1', // Warm Silver
+        '#ffb5a7', // Pastel Coral
+        '#fda4af'  // Soft Rose Pink
+      ];
+
+      let clickCount = 0;
+      let elementIndex = 0;
+
+      function getNonWhiteElements() {
+        const selectors = [
+          '.purple-text',
+          '.gradient-text',
+          '.hero-badge',
+          '.logo span span',
+          '.brain-logo',
+          '.step-label',
+          '.card-icon',
+          '.m-icon',
+          '.u-icon',
+          '.ext-tag',
+          '.selected-summary-pills',
+          '.summary-stat .val',
+          '.company-role-title',
+          '.salary-val',
+          '.match-badge',
+          '.board-badge',
+          '.node-indicator',
+          '.roadmap-node h4',
+          '.pulse-green'
+        ];
+        
+        const elements = [];
+        selectors.forEach(sel => {
+          document.querySelectorAll(sel).forEach(el => {
+            if (el && !elements.includes(el)) {
+              elements.push(el);
+            }
+          });
+        });
+        return elements;
+      }
+
+      document.addEventListener('click', (e) => {
+        // Skip clicks on inputs, textareas, selects, and controls
+        if (
+          e.target.tagName === 'INPUT' || 
+          e.target.tagName === 'SELECT' || 
+          e.target.tagName === 'TEXTAREA' || 
+          e.target.closest('#gemini-panel') ||
+          e.target.closest('.theme-toggle-btn')
+        ) {
+          return;
+        }
+
+        clickCount++;
+
+        const elements = getNonWhiteElements();
+        if (elements.length > 0) {
+          // Select target element and color from 3*4 pool
+          const targetEl = elements[elementIndex % elements.length];
+          const color = colors[clickCount % colors.length];
+
+          // Apply soft transition color
+          targetEl.style.transition = 'color 0.8s ease, background 0.8s ease, -webkit-text-fill-color 0.8s ease';
+          targetEl.style.color = color;
+          targetEl.style.webkitTextFillColor = color;
+          targetEl.style.backgroundImage = 'none';
+          targetEl.style.background = 'none';
+
+          elementIndex++;
+        }
+      });
+    })();
   </script>
 </body>
 </html>

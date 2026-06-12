@@ -9,9 +9,9 @@
   --mirror-bg: #000000;
   --mirror-surface: rgba(255, 255, 255, 0.03);
   --mirror-surface-hover: rgba(255, 255, 255, 0.06);
-  --mirror-accent: #c0c0c0;
-  --mirror-accent2: #e8e8e8;
-  --mirror-accent-glow: rgba(255, 255, 255, 0.08);
+  --mirror-accent: #ff5e36;
+  --mirror-accent2: #d6d3d1;
+  --mirror-accent-glow: rgba(255, 94, 54, 0.12);
   --mirror-text: #f0f0f0;
   --mirror-text2: rgba(255, 255, 255, 0.5);
   --mirror-text3: rgba(255, 255, 255, 0.25);
@@ -83,7 +83,7 @@ h1, h2, h3, h4 {
 .landing-bg-glow .glow-2 {
   width: 500px;
   height: 500px;
-  background: #a0a0a0;
+  background: #ff5e36;
   bottom: -100px;
   right: -100px;
   animation-delay: -10s;

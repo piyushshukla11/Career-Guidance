@@ -59,3 +59,107 @@ Landing Page (index.html)
 - API key saved to `gemini-env/.env` (gitignored)
 - `api/gemini.js` updated to auto-initialize with the key on page load
 - Key also persists in localStorage for the app's settings panel
+
+---
+
+## 2026-06-12 — Real Backend Server Implemented ✅
+
+### Summary
+Replaced the client-side-only localStorage auth and browser-exposed Gemini API with a fully functional Node.js/Express backend.
+
+### New Files Created:
+| File | Purpose |
+|------|---------|
+| `server.js` | Express backend — auth routes, Gemini proxy, static file serving |
+| `package.json` | Node.js project config with dependencies |
+| `.env` | Server configuration (Gemini API key, session secret, port) |
+| `data/users.json` | JSON file database for user accounts (auto-created) |
+
+### Modified Files:
+| File | Changes |
+|------|---------|
+| `js/login.js` | Replaced localStorage auth with `fetch('/api/auth/login')` and `/signup` API calls |
+| `app.html` | Session check via `fetch('/api/auth/me')`, logout via `fetch('/api/auth/logout')` |
+| `api/gemini.js` | Routes through `/api/gemini/generate` server proxy, with client-side fallback |
+| `.gitignore` | Added `data/`, `*.db`, `.env` |
+
+### Backend API Endpoints:
+| Method | Route | Purpose |
+|--------|-------|---------|
+| `POST` | `/api/auth/signup` | Create user with bcrypt-hashed password |
+| `POST` | `/api/auth/login` | Authenticate & create server-side session |
+| `POST` | `/api/auth/logout` | Destroy session |
+| `GET`  | `/api/auth/me` | Check if session is active |
+| `POST` | `/api/gemini/generate` | Server-side Gemini API proxy (auth required) |
+
+### Key Tech Decisions:
+- Used `bcryptjs` (pure JS) instead of `bcrypt` (native) to avoid C++ build tools requirement
+- Used JSON file storage instead of SQLite to avoid native `better-sqlite3` compilation issues on Windows
+- Server-side sessions via `express-session` with HTTP-only cookies
+- Gemini API key stored in `.env` on server — never exposed to browser
+
+---
+
+## 2026-06-12 — Dither Animation Mouse Fix ✅
+
+- Fixed: dither wave animation on login page would freeze when mouse passed over the login card, then jerk back when exiting
+- **Root cause**: `mousemove` listener was on the dither container only; login card blocked events from reaching it
+- **Fix**: Changed `mousemove` listener from `container` to `document` level in `js/dither.js`
+- Removed unnecessary `pointer-events: auto` from dither container in `login.html`
+
+---
+
+## 2026-06-12 — Back to Home Button Visibility ✅
+
+- Made "Back to Home" link on login page more visible over the dither animation
+- Changed from faint 25% opacity text to a glassmorphic pill button with:
+  - 85% white text, dark blurred background, subtle border
+  - Hover effect brightens to full white
+
+---
+
+## 2026-06-12 — Transparent Glassy Black Navbar ✅
+
+- Made the main app navbar (`main-nav`) fully transparent with glassy black glassmorphism:
+  - `background: rgba(0, 0, 0, 0.25)` — nearly transparent dark background
+  - `backdrop-filter: blur(28px)` — strong blur so the blobs/content below bleeds through
+  - Bottom border changed to a hairline `rgba(255,255,255, 0.06)` — ultra-subtle white line
+  - Deep shadow `rgba(0,0,0,0.4)` to lift the bar visually from content
+- Updated the `.glass` base class to use `rgba(0,0,0,0.35)` + lighter border `rgba(255,255,255,0.07)` for all glass cards
+
+---
+
+## 2026-06-12 — Premium Minimalist Dark Theme Refactoring ✅
+
+- **Global Color Variables Migration**: Created a cohesive design language across the application using:
+  - **Background**: Pure pitch-black `#000000`
+  - **Text**: Pure white `#ffffff` (headings/primary) and neutral zinc grays `#a1a1aa`/`#71717a` (secondary/muted)
+  - **Accents**: Premium light Sky Blue `#7dd3fc` and Slate `#94a3b8`
+- **Global Theme Cleanup**:
+  - Replaced all hardcoded blue (`rgba(79, 142, 247, ...)`) and purple (`rgba(124, 58, 237, ...)`) properties inside `css/style.css` with coordinated variable-aligned values or neutral transitions.
+- **HTML Markup Cleanup**:
+  - Removed all raw inline style overrides from `app.html` (`body`, `.blob-bg`, and `.main-nav`).
+  - Added clean default stylesheet styling rule updates inside `css/style.css` to manage background states and navigation styles.
+  - Cache-busted the app stylesheet inside `app.html` (bumped query parameter to `v=11`) to force instant visual updates.
+- **Slow Ambient Breathing Background Glow**:
+  - Re-enabled glowing background blobs on the pitch-black layout with a custom `@keyframes ambientBreath` animation (ranging from `0.005` to `0.045` opacity).
+  - Slowed down floating velocity using offsets (80s, 95s, and 70s) to create an organic, non-synchronized floating effect.
+  - Keeps the background blob colors static (as originally styled) and not changing automatically.
+- **Click-Based Highlight Text Color Shifter**:
+  - Implemented a JavaScript handler in `app.html` that registers a document click event.
+  - With each click on the page (excluding inputs, buttons, and settings panels), a non-white accent text highlight, badge, or icon updates to the next color in a 12 (3*4) premium color palette one by one.
+  - Smoothly changes colors of the elements gradually over consecutive clicks.
+- **Reddish-Orange Color Palette Migration**:
+  - Changed CSS variable `--accent` to Reddish Orange (`#ff5e36`) and `--accent2` to Warm Silver (`#d6d3d1`).
+  - Coordinated the 12-color click-shift array inside `app.html` to a warm reddish-orange aligned palette of premium corals, oranges, ambers, and warm grays.
+- **Global Page Alignment (Landing, Login, About)**:
+  - Updated variables inside `css/landing.css` (`--mirror-accent` and `--mirror-accent-glow`) and `css/login.css` (`--login-accent` and `--login-accent-glow`) to the new Reddish Orange color scheme.
+  - Adjusted the bottom-right ambient glow orb on the landing page to reddish-orange.
+  - Updated the dither wave background simulation color on `login.html` to a warm reddish-orange `[1.0, 0.37, 0.21]`.
+  - Cache-busted all stylesheets across `index.html`, `login.html`, and `about.html` (bumped to `v=2`).
+- **Navbar Controls Alignment**:
+  - Defined flexbox layout on `.nav-right` with vertical centering (`align-items: center`) and a clean `12px` gap.
+  - Removed raw inline margins from the greeting span and logout button inside `app.html`.
+  - Cache-busted `app.html` stylesheet to `v=12`.
+
+

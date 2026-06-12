@@ -1,6 +1,6 @@
 /* ==========================================================================
    AuraCareer — Login Page Logic
-   Auth tab switching, form validation, localStorage session management
+   Auth tab switching, form validation, backend API authentication
    ========================================================================== */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // --- Login form submission ---
-  loginForm.addEventListener('submit', (e) => {
+  loginForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     clearErrors();
 
@@ -53,53 +53,43 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (!valid) return;
 
-    // Simulate login
     const submitBtn = loginForm.querySelector('.login-submit');
     submitBtn.classList.add('loading');
 
-    setTimeout(() => {
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+
+      const data = await res.json();
       submitBtn.classList.remove('loading');
 
-      // Check localStorage for existing user
-      const storedUsers = JSON.parse(localStorage.getItem('auracareer_users') || '[]');
-      const user = storedUsers.find(u => u.email === email);
-
-      if (user && user.password === password) {
-        // Successful login
-        localStorage.setItem('auracareer_session', JSON.stringify({
-          name: user.name,
-          email: user.email,
-          loggedIn: true,
-          timestamp: Date.now()
-        }));
+      if (res.ok && data.success) {
         showToast('Login successful! Redirecting...', 'success');
         setTimeout(() => {
           window.location.href = 'app.html';
         }, 1000);
-      } else if (user) {
-        showToast('Incorrect password. Please try again.', 'error');
-        showFieldError('login-password-field', 'Incorrect password');
       } else {
-        // Auto-create account for demo purposes
-        const name = email.split('@')[0].replace(/[._-]/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
-        storedUsers.push({ name, email, password });
-        localStorage.setItem('auracareer_users', JSON.stringify(storedUsers));
-        localStorage.setItem('auracareer_session', JSON.stringify({
-          name,
-          email,
-          loggedIn: true,
-          timestamp: Date.now()
-        }));
-        showToast('Account created & logged in! Redirecting...', 'success');
-        setTimeout(() => {
-          window.location.href = 'app.html';
-        }, 1000);
+        const errMsg = data.error || 'Login failed. Please try again.';
+        showToast(errMsg, 'error');
+
+        if (errMsg.toLowerCase().includes('password')) {
+          showFieldError('login-password-field', errMsg);
+        } else if (errMsg.toLowerCase().includes('email') || errMsg.toLowerCase().includes('account')) {
+          showFieldError('login-email-field', errMsg);
+        }
       }
-    }, 1200);
+    } catch (err) {
+      submitBtn.classList.remove('loading');
+      showToast('Network error. Is the server running?', 'error');
+      console.error('[Login] Request failed:', err);
+    }
   });
 
   // --- Signup form submission ---
-  signupForm.addEventListener('submit', (e) => {
+  signupForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     clearErrors();
 
@@ -127,50 +117,41 @@ document.addEventListener('DOMContentLoaded', () => {
     const submitBtn = signupForm.querySelector('.login-submit');
     submitBtn.classList.add('loading');
 
-    setTimeout(() => {
+    try {
+      const res = await fetch('/api/auth/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, password })
+      });
+
+      const data = await res.json();
       submitBtn.classList.remove('loading');
 
-      const storedUsers = JSON.parse(localStorage.getItem('auracareer_users') || '[]');
-      const exists = storedUsers.find(u => u.email === email);
+      if (res.ok && data.success) {
+        showToast('Account created! Redirecting to AuraCareer...', 'success');
+        setTimeout(() => {
+          window.location.href = 'app.html';
+        }, 1000);
+      } else {
+        const errMsg = data.error || 'Signup failed. Please try again.';
+        showToast(errMsg, 'error');
 
-      if (exists) {
-        showToast('An account with this email already exists. Please log in.', 'error');
-        showFieldError('signup-email-field', 'Email already registered');
-        return;
+        if (errMsg.toLowerCase().includes('email') || errMsg.toLowerCase().includes('exists')) {
+          showFieldError('signup-email-field', errMsg);
+        }
       }
-
-      storedUsers.push({ name, email, password });
-      localStorage.setItem('auracareer_users', JSON.stringify(storedUsers));
-      localStorage.setItem('auracareer_session', JSON.stringify({
-        name,
-        email,
-        loggedIn: true,
-        timestamp: Date.now()
-      }));
-
-      showToast('Account created! Redirecting to AuraCareer...', 'success');
-      setTimeout(() => {
-        window.location.href = 'app.html';
-      }, 1000);
-    }, 1200);
+    } catch (err) {
+      submitBtn.classList.remove('loading');
+      showToast('Network error. Is the server running?', 'error');
+      console.error('[Signup] Request failed:', err);
+    }
   });
 
-  // --- Social login (demo) ---
+  // --- Social login (placeholder) ---
   const googleBtn = document.getElementById('google-login-btn');
   if (googleBtn) {
     googleBtn.addEventListener('click', () => {
-      const name = 'Google User';
-      const email = 'user@gmail.com';
-      localStorage.setItem('auracareer_session', JSON.stringify({
-        name,
-        email,
-        loggedIn: true,
-        timestamp: Date.now()
-      }));
-      showToast('Google sign-in successful! Redirecting...', 'success');
-      setTimeout(() => {
-        window.location.href = 'app.html';
-      }, 1000);
+      showToast('Google OAuth integration coming soon!', 'error');
     });
   }
 
@@ -187,6 +168,16 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   });
+
+  // --- Redirect if already logged in ---
+  fetch('/api/auth/me')
+    .then(res => res.json())
+    .then(data => {
+      if (data.loggedIn) {
+        window.location.href = 'app.html';
+      }
+    })
+    .catch(() => { /* Server might not be running, stay on login page */ });
 });
 
 // --- Utility functions ---

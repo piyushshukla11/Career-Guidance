@@ -240,7 +240,7 @@ function createDither(container, options = {}) {
   }
 
   if (config.enableMouseInteraction) {
-    container.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mousemove', onMouseMove);
   }
 
   // --- Render Loop ---
@@ -277,7 +277,7 @@ function createDither(container, options = {}) {
       destroyed = true;
       cancelAnimationFrame(rafId);
       window.removeEventListener('resize', resize);
-      container.removeEventListener('mousemove', onMouseMove);
+      document.removeEventListener('mousemove', onMouseMove);
       gl.deleteProgram(program);
       gl.deleteBuffer(vbo);
       gl.deleteShader(vs);

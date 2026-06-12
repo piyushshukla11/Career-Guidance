@@ -14,8 +14,11 @@
   <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
+  <!-- Google Identity Services -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+
   <!-- Login Styles -->
-  <link rel="stylesheet" href="css/login.css">
+  <link rel="stylesheet" href="css/login.css?v=2">
 </head>
 <body class="login-body">
 
@@ -121,7 +124,7 @@
       </div>
 
       <!-- Social Login -->
-      <button class="social-btn" id="google-login-btn">
+      <button class="social-btn" id="google-login-btn" onclick="triggerGoogleLogin()">
         <svg width="18" height="18" viewBox="0 0 48 48">
           <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
           <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
@@ -130,6 +133,12 @@
         </svg>
         Continue with Google
       </button>
+
+      <!-- Hidden div for GIS One-Tap (fallback) -->
+      <div id="g_id_onload"
+        data-auto_prompt="false"
+        data-callback="handleGoogleCredential">
+      </div>
     </div>
 
     <!-- Footer -->
@@ -144,10 +153,8 @@
     document.addEventListener('DOMContentLoaded', () => {
       const ditherContainer = document.getElementById('dither-bg');
       if (ditherContainer && typeof createDither === 'function') {
-        // Allow mouse interaction on the background
-        ditherContainer.style.pointerEvents = 'auto';
         createDither(ditherContainer, {
-          waveColor: [0.5, 0.5, 0.5],
+          waveColor: [1.0, 0.37, 0.21],
           disableAnimation: false,
           enableMouseInteraction: true,
           mouseRadius: 0.3,
@@ -157,6 +164,107 @@
           waveSpeed: 0.05,
           pixelSize: 2
         });
+      }
+    });
+  </script>
+
+  <!-- Google OAuth Logic -->
+  <script>
+    let _googleClientId = null;
+
+    // Fetch client ID from server and initialise GIS
+    async function initGoogleAuth() {
+      try {
+        const res = await fetch('/api/auth/google-client-id');
+        if (!res.ok) {
+          console.warn('[Google] Client ID not configured on server.');
+          return;
+        }
+        const { clientId } = await res.json();
+        _googleClientId = clientId;
+
+        // Initialise Google Identity Services
+        google.accounts.id.initialize({
+          client_id: clientId,
+          callback: handleGoogleCredential,
+          auto_select: false,
+          cancel_on_tap_outside: true
+        });
+
+        // Update the onload div with client id
+        const onloadDiv = document.getElementById('g_id_onload');
+        if (onloadDiv) onloadDiv.setAttribute('data-client_id', clientId);
+
+        console.log('[Google] GIS initialized.');
+      } catch (err) {
+        console.warn('[Google] Could not initialize Google auth:', err.message);
+      }
+    }
+
+    // Triggered when user clicks the Google button
+    function triggerGoogleLogin() {
+      if (!_googleClientId) {
+        showToast('Google sign-in is not configured yet. See setup guide.', 'error');
+        return;
+      }
+      // Show the Google One-Tap / popup prompt
+      google.accounts.id.prompt((notification) => {
+        if (notification.isNotDisplayed()) {
+          // One-tap blocked (e.g. dismissed too many times) — show regular popup
+          google.accounts.id.renderButton(
+            document.getElementById('google-login-btn'),
+            { theme: 'outline', size: 'large', width: 380 }
+          );
+        }
+      });
+    }
+
+    // Called by GIS after user picks their Google account
+    async function handleGoogleCredential(response) {
+      const btn = document.getElementById('google-login-btn');
+      if (btn) {
+        btn.disabled = true;
+        btn.style.opacity = '0.7';
+      }
+
+      try {
+        const res = await fetch('/api/auth/google', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ credential: response.credential })
+        });
+
+        const data = await res.json();
+
+        if (res.ok && data.success) {
+          showToast('Google sign-in successful! Redirecting...', 'success');
+          setTimeout(() => {
+            window.location.href = 'app.html';
+          }, 1000);
+        } else {
+          showToast(data.error || 'Google sign-in failed.', 'error');
+        }
+      } catch (err) {
+        showToast('Network error during Google sign-in.', 'error');
+        console.error('[Google] Auth error:', err);
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.style.opacity = '1';
+        }
+      }
+    }
+
+    // Init when GIS library is ready
+    window.addEventListener('load', () => {
+      if (typeof google !== 'undefined' && google.accounts) {
+        initGoogleAuth();
+      } else {
+        // GIS script may still be loading — wait for it
+        const script = document.querySelector('script[src*="gsi/client"]');
+        if (script) {
+          script.addEventListener('load', initGoogleAuth);
+        }
       }
     });
   </script>

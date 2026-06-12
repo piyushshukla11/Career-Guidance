@@ -6,10 +6,10 @@
 :root {
   --login-bg: #000000;
   --login-surface: rgba(0, 0, 0, 0.65);
-  --login-accent: #c0c0c0;
-  --login-accent2: #e8e8e8;
-  --login-accent-glow: rgba(255, 255, 255, 0.08);
-  --login-accent2-glow: rgba(255, 255, 255, 0.05);
+  --login-accent: #ff5e36;
+  --login-accent2: #d6d3d1;
+  --login-accent-glow: rgba(255, 94, 54, 0.12);
+  --login-accent2-glow: rgba(214, 211, 209, 0.08);
   --login-text: #f0f0f0;
   --login-text2: rgba(255, 255, 255, 0.5);
   --login-text3: rgba(255, 255, 255, 0.25);
@@ -58,20 +58,26 @@ body.login-body {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  color: var(--login-text3);
+  color: rgba(255, 255, 255, 0.85);
   font-size: 0.85rem;
-  font-weight: 500;
+  font-weight: 600;
   text-decoration: none;
   margin-bottom: 28px;
-  transition: color 0.2s ease;
+  padding: 8px 16px;
+  border-radius: 100px;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  transition: all 0.25s ease;
   cursor: pointer;
-  background: none;
-  border: none;
   font-family: inherit;
 }
 
 .login-back:hover {
-  color: var(--login-text);
+  color: #ffffff;
+  background: rgba(0, 0, 0, 0.7);
+  border-color: rgba(255, 255, 255, 0.25);
 }
 
 /* ==========================================================================

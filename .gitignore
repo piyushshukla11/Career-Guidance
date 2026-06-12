@@ -6,10 +6,15 @@ Thumbs.db
 .vscode/
 .idea/
 
-# Node (if added later)
+# Node
 node_modules/
 
+# Database files
+*.db
+data/
+
 # Environment / API keys
+.env
 gemini-env/.env
 *.env
 !*.env.example

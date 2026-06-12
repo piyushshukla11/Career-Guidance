@@ -1,47 +1,73 @@
 /* ==========================================================================
    AuraCareer — Gemini API Integration Module
-   Client-side wrapper for Google Gemini API calls
+   Client-side wrapper that proxies requests through the backend server
    ========================================================================== */
 
 const GeminiAPI = (() => {
-  let API_KEY = '';
+  // Optional: allow client-side key for fallback (not recommended for production)
+  let CLIENT_API_KEY = '';
   let MODEL = 'gemini-2.0-flash';
-  const BASE_URL = 'https://generativelanguage.googleapis.com/v1beta/models';
+  const DIRECT_BASE_URL = 'https://generativelanguage.googleapis.com/v1beta/models';
 
   /**
-   * Initialize the Gemini API module with an API key
-   * @param {string} apiKey - Your Google Gemini API key
+   * Initialize the Gemini API module with an optional client-side API key
+   * In production, the server handles the key via .env — this is only a fallback
+   * @param {string} apiKey - Optional client-side API key
    * @param {string} [model] - Model to use (default: gemini-2.0-flash)
    */
   function init(apiKey, model) {
-    if (!apiKey || typeof apiKey !== 'string') {
-      console.error('[GeminiAPI] Invalid API key provided.');
-      return false;
+    if (apiKey && typeof apiKey === 'string') {
+      CLIENT_API_KEY = apiKey.trim();
     }
-    API_KEY = apiKey.trim();
     if (model) MODEL = model;
     console.log(`[GeminiAPI] Initialized with model: ${MODEL}`);
     return true;
   }
 
   /**
-   * Check if API is configured
+   * Check if API is configured (either server-side or client-side)
    */
   function isConfigured() {
-    return API_KEY.length > 0;
+    // Always true — the server may have the key configured even if client doesn't
+    return true;
   }
 
   /**
-   * Send a prompt to Gemini and get a text response
+   * Send a prompt to Gemini via the backend proxy, with client-side fallback
    * @param {string} prompt - The text prompt
    * @returns {Promise<string>} The generated text response
    */
   async function generateText(prompt) {
-    if (!isConfigured()) {
-      throw new Error('Gemini API not initialized. Call GeminiAPI.init(apiKey) first.');
+    // Try server-side proxy first (recommended — keeps API key secure)
+    try {
+      const response = await fetch('/api/gemini/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt, model: MODEL })
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.text) return data.text;
+      }
+
+      // If server returns 503 (no key configured), try client-side fallback
+      const errorData = await response.json().catch(() => ({}));
+      if (response.status !== 503 || !CLIENT_API_KEY) {
+        throw new Error(errorData.error || `Server proxy error: HTTP ${response.status}`);
+      }
+    } catch (err) {
+      // If server proxy fails and we have a client key, fall through to direct call
+      if (!CLIENT_API_KEY) throw err;
+      console.warn('[GeminiAPI] Server proxy failed, using client-side fallback:', err.message);
     }
 
-    const url = `${BASE_URL}/${MODEL}:generateContent?key=${API_KEY}`;
+    // Client-side fallback (only if a key was provided via the settings panel)
+    if (!CLIENT_API_KEY) {
+      throw new Error('Gemini API not configured. Set GEMINI_API_KEY in your server .env file.');
+    }
+
+    const url = `${DIRECT_BASE_URL}/${MODEL}:generateContent?key=${CLIENT_API_KEY}`;
 
     const body = {
       contents: [{
@@ -55,38 +81,30 @@ const GeminiAPI = (() => {
       }
     };
 
-    try {
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body)
-      });
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        const msg = errorData?.error?.message || `HTTP ${response.status}`;
-        throw new Error(`Gemini API error: ${msg}`);
-      }
-
-      const data = await response.json();
-      const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-
-      if (!text) {
-        throw new Error('No text content in Gemini response');
-      }
-
-      return text;
-    } catch (err) {
-      console.error('[GeminiAPI] Request failed:', err.message);
-      throw err;
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      const msg = errorData?.error?.message || `HTTP ${response.status}`;
+      throw new Error(`Gemini API error: ${msg}`);
     }
+
+    const data = await response.json();
+    const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+
+    if (!text) {
+      throw new Error('No text content in Gemini response');
+    }
+
+    return text;
   }
 
   /**
    * Get AI-powered career advice based on user skills and profile
-   * @param {string[]} skills - Array of skill names
-   * @param {object} profile - User profile (name, location, degree, experience, proficiency)
-   * @returns {Promise<string>} Career advice text
    */
   async function getCareerAdvice(skills, profile) {
     const prompt = `You are an expert Indian career counselor. A user has the following profile:
@@ -111,8 +129,6 @@ Keep the response concise and actionable. Format with clear sections.`;
 
   /**
    * Get AI insights for resume text
-   * @param {string} resumeText - Extracted text from resume
-   * @returns {Promise<string>} Resume analysis
    */
   async function getResumeInsights(resumeText) {
     const prompt = `Analyze this resume text and extract:
@@ -132,9 +148,6 @@ Provide a structured, concise analysis focused on the Indian tech job market.`;
 
   /**
    * Get skill gap analysis
-   * @param {string[]} currentSkills - User's current skills
-   * @param {string} targetRole - Desired career role
-   * @returns {Promise<string>} Skill gap analysis
    */
   async function getSkillGapAnalysis(currentSkills, targetRole) {
     const prompt = `A user in India wants to become a "${targetRole}". 
@@ -163,7 +176,7 @@ Be specific and practical. Focus on Indian job market requirements.`;
   };
 })();
 
-// Auto-load API key from localStorage if previously saved
+// Auto-load API key from localStorage if previously saved (client-side fallback)
 (function autoLoadKey() {
   const savedKey = localStorage.getItem('auracareer_gemini_key');
   if (savedKey) {
