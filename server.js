@@ -99,8 +99,8 @@ app.use(session({
   cookie: {
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     httpOnly: true,
-    sameSite: isProduction ? 'none' : 'lax',
-    secure: isProduction // Required for 'none' sameSite in production
+    sameSite: 'lax', // Use 'lax' for Railway compatibility
+    secure: isProduction // Required for HTTPS in production
   }
 }));
 
