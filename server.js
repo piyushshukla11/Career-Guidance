@@ -460,7 +460,7 @@ async function startServer() {
     // Connect to MongoDB before starting the server
     await connectDB();
     
-    app.listen(PORT, () => {
+    app.listen(PORT, '0.0.0.0', () => {
       console.log(`\n✦ Career Guidance Server running at http://localhost:${PORT}`);
       console.log(`  → Login:  http://localhost:${PORT}/login.html`);
       console.log(`  → App:    http://localhost:${PORT}/app.html`);
