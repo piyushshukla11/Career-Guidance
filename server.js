@@ -8,6 +8,7 @@ require('dotenv').config();
 
 const express = require('express');
 const session = require('express-session');
+const MongoStore = require('connect-mongo');
 const bcrypt = require('bcryptjs');
 const { MongoClient } = require('mongodb');
 const cors = require('cors');
@@ -101,17 +102,18 @@ app.use(cors({
 // Detect if running in production (Railway)
 const isProduction = process.env.NODE_ENV === 'production' || process.env.RAILWAY_ENVIRONMENT === 'production';
 
+// Placeholder session middleware (will be replaced with MongoDB store in startServer)
 app.use(session({
   secret: process.env.SESSION_SECRET || 'fallback-secret-change-me',
   resave: true,
   saveUninitialized: true,
-  proxy: isProduction, // Trust proxy in production
+  proxy: isProduction,
   cookie: {
     path: '/',
-    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    maxAge: 7 * 24 * 60 * 60 * 1000,
     httpOnly: true,
-    sameSite: isProduction ? 'none' : 'lax', // Use 'none' in production for cross-site
-    secure: isProduction // Required for HTTPS in production
+    sameSite: isProduction ? 'none' : 'lax',
+    secure: isProduction
   }
 }));
 
@@ -459,6 +461,31 @@ async function startServer() {
   try {
     // Connect to MongoDB before starting the server
     await connectDB();
+    
+    // Setup MongoDB session store
+    const sessionStore = MongoStore.create({
+      mongoUrl: MONGODB_URI,
+      collectionName: 'sessions',
+      touchAfter: 24 * 3600 // Lazy session update (in seconds)
+    });
+
+    // Replace the session middleware with MongoDB-backed version
+    app.use(session({
+      store: sessionStore,
+      secret: process.env.SESSION_SECRET || 'fallback-secret-change-me',
+      resave: false,
+      saveUninitialized: false,
+      proxy: isProduction,
+      cookie: {
+        path: '/',
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+        httpOnly: true,
+        sameSite: isProduction ? 'none' : 'lax',
+        secure: isProduction
+      }
+    }));
+
+    console.log('[SESSION] MongoDB session store configured');
     
     app.listen(PORT, '0.0.0.0', () => {
       console.log(`\n✦ Career Guidance Server running at http://localhost:${PORT}`);
